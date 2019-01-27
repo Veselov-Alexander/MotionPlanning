@@ -223,12 +223,26 @@ def findInDict(dictionary, searchValue):
     for key, value in dictionary.items():
         if value == searchValue:
             return key
- 
-def Dijkstra(pathMap, src, dest):
-    uniquePoints = set()
+
+def isUnique(uniquePoints, point):
+    EPS = 0.01
+    for upoint in uniquePoints:
+        if math.sqrt(dist(point, upoint)) < EPS:
+            return False
+    return True
+
+def mapToPointSet(pathMap):
+    uniquePoints = []
     for segment in pathMap:
-        uniquePoints.add(segment[0])
-        uniquePoints.add(segment[1])
+        if isUnique(uniquePoints, segment[0]):
+            uniquePoints.append(segment[0])
+        if isUnique(uniquePoints, segment[1]):
+            uniquePoints.append(segment[1])
+    return uniquePoints
+
+def Dijkstra(pathMap, src, dest):
+    uniquePoints = mapToPointSet(pathMap)
+
     labeledPoints = dict()
     for i, point in enumerate(uniquePoints):
         labeledPoints.update({point : i})

@@ -143,10 +143,14 @@ class MovePolygonMode(Mode):
 
     def processMouseMoveEvent(self, event):
         if self.isMoving:
+            delta = event.pos() - self.startPos
+            newPoints = []
             for i in range(len(self.selectedItem.points)):
-                point = self.app.scaleQPoint(event.pos() - self.startPos +
-                                             self.app.scalePoint(self.itemStartPoints[i]))
-                self.selectedItem.points[i] = point
+                point = self.app.scaleQPoint(delta + self.app.scalePoint(self.itemStartPoints[i]))
+                if not (-100 <= point[0] <= 100) or not (-100 <= point[1] <= 100):
+                    return
+                newPoints.append(point)
+            self.selectedItem.points = newPoints
             self.app.update()
 
     def blockButtons(self):
@@ -371,17 +375,20 @@ class ExampleMode(Mode):
             self.button.clicked.connect(self.processClick)
 
         def load(self):
-            fileName = QFileDialog().getOpenFileName(self.mode.app, "Open file", "test")[0]
-            if not fileName:
-                 return
-            self.lines = open(fileName, "r").readlines()
-            self.readIndex = 0
-            self.mode.app.robot = self.readPolygon()
-            polygonCount = int(self.read())
-            self.mode.app.polygons.clear()
-            for i in range(polygonCount):
-                self.mode.app.polygons.append(self.readPolygon())
-            self.mode.app.buildVisibilityMap()
+            try:
+                fileName = QFileDialog().getOpenFileName(self.mode.app, "Open file", "test")[0]
+                if not fileName:
+                     return
+                self.lines = open(fileName, "r").readlines()
+                self.readIndex = 0
+                self.mode.app.robot = self.readPolygon()
+                polygonCount = int(self.read())
+                self.mode.app.polygons.clear()
+                for i in range(polygonCount):
+                    self.mode.app.polygons.append(self.readPolygon())
+                self.mode.app.buildVisibilityMap()
+            except:
+                print("Wrong file.")
 
         def read(self):
             data = self.lines[self.readIndex].rstrip()
