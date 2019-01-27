@@ -4,7 +4,7 @@ from QtColors import *
 from Algorithm import *
 from Polygon import *
 
-WINDOW_SIZE = float(800)
+WINDOW_SIZE = float(600)
 
 class QCanvas:   
     def __init__(self):
