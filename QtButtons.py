@@ -144,10 +144,11 @@ class MovePolygonMode(Mode):
     def processMouseMoveEvent(self, event):
         if self.isMoving:
             delta = event.pos() - self.startPos
+            r = self.app.getPlotRange()
             newPoints = []
             for i in range(len(self.selectedItem.points)):
                 point = self.app.scaleQPoint(delta + self.app.scalePoint(self.itemStartPoints[i]))
-                if not (-100 <= point[0] <= 100) or not (-100 <= point[1] <= 100):
+                if not (-r <= point[0] <= r) or not (-r <= point[1] <= r):
                     return
                 newPoints.append(point)
             self.selectedItem.points = newPoints
@@ -383,6 +384,8 @@ class ExampleMode(Mode):
                 self.readIndex = 0
                 self.mode.app.robot = self.readPolygon()
                 polygonCount = int(self.read())
+                if polygonCount > 30:
+                    raise Exception()
                 self.mode.app.polygons.clear()
                 for i in range(polygonCount):
                     self.mode.app.polygons.append(self.readPolygon())
@@ -397,6 +400,8 @@ class ExampleMode(Mode):
 
         def readPolygon(self):
             pointCount = int(self.read())
+            if pointCount > 100:
+                raise Exception()
             points = []
             for i in range(pointCount):
                 line = self.read().split()
