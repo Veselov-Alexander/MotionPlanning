@@ -143,13 +143,13 @@ class MovePolygonMode(Mode):
 
     def processMouseMoveEvent(self, event):
         if self.isMoving:
-            delta = event.pos() - self.startPos
             r = self.app.getPlotRange()
+            delta = self.app.scaleQPoint(event.pos() - self.startPos)
+            delta = (delta[0] + r, delta[1] - r)
             newPoints = []
             for i in range(len(self.selectedItem.points)):
-                point = self.app.scaleQPoint(delta + self.app.scalePoint(self.itemStartPoints[i]))
-                if not (-r <= point[0] <= r) or not (-r <= point[1] <= r):
-                    return
+                point = (delta[0] + self.itemStartPoints[i][0],
+                         delta[1] + self.itemStartPoints[i][1])
                 newPoints.append(point)
             self.selectedItem.points = newPoints
             self.app.update()
