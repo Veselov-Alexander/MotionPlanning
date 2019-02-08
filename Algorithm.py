@@ -224,6 +224,13 @@ def findInDict(dictionary, searchValue):
         if value == searchValue:
             return key
 
+def findByEps(dictionary, searchKey):
+    EPS = 0.01
+    for key, value in dictionary.items():
+        if math.sqrt(dist(key, searchKey)) < EPS:
+            return value
+    return None
+
 def isUnique(uniquePoints, point):
     EPS = 0.01
     for upoint in uniquePoints:
@@ -249,17 +256,17 @@ def Dijkstra(pathMap, src, dest):
     pointCount = len(uniquePoints)
     csgraph = [[0.0] * pointCount for _ in range(pointCount)]
     for segment in pathMap:
-        first = labeledPoints[segment[0]]
-        second = labeledPoints[segment[1]]
+        first = findByEps(labeledPoints, segment[0])
+        second = findByEps(labeledPoints, segment[1])
         distance = dist(segment[0], segment[1])
         csgraph[first][second] = math.sqrt(distance)
         csgraph[second][first] = math.sqrt(distance)
     csgraph = np.array(csgraph, dtype=float)   
     path, predecessors  = shortest_path(csgraph, return_predecessors=True)
-    if not labeledPoints.get(src) or not labeledPoints.get(dest):
+    current = findByEps(labeledPoints, src)
+    i = findByEps(labeledPoints, dest)
+    if not current or not i:
         return
-    current = labeledPoints[src]
-    i = labeledPoints[dest]
     path = []
     while current != -9999:
         path.append(findInDict(labeledPoints, current))
